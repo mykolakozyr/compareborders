@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Порівняння межі ОТГ</title>
+<!--     <link rel="shortcut icon" href="data/tdu.png" type="image/png"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- LEAFLET -->
+    <script src='lib/leaflet-src.js'></script>
+    <script src="lib/leaflet.js"></script>
+    <link rel="stylesheet" href="lib/leaflet.css" />
+    <script src="lib/L.Map.Sync.js"></script>
+
+    <script src="data/admin_3.geojson" ></script>
+    <script src="data/pashas.geojson" ></script>
+    <!-- AJAX -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> 
+    <!--[if lte IE 8]><link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.ie.css" /><![endif]-->
+    <style type="text/css">
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        #mapA, #mapB { width: 49.5%; height: 100%; }
+        #mapA { float: left; }
+        #mapB { float: right; }
+        .infoB {
+            top: 6px;
+            right: 10px;
+            padding: 6px 8px; 
+            font: 14px/16px Arial, Helvetica, sans-serif; 
+            background: white; background: rgba(255,255,255,0.75); 
+            box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px;
+        } 
+        .infoB h4 { 
+            margin: 0 0 5px; 
+            color: #777;
+        }    
+        .infoA {
+            top: 6px;
+            right: 10px;
+            padding: 6px 8px; 
+            font: 14px/16px Arial, Helvetica, sans-serif; 
+            background: white; background: rgba(255,255,255,0.75); 
+            box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px;
+        } 
+        .infoA h4 { 
+            margin: 0 0 5px; 
+            color: #777;
+        }  
+    </style>
+</head>
+<body>
+    <div id="mapA"></div>
+    <div id="mapB"></div>
+
+    <script>
+
+        function style_16(feature){
+            return {
+                fillColor: '#8856a7',
+                weight: 1,
+                fillOpacity: 0.6,
+                color: 'white',
+                dashArray: 3,
+                opacity: 0.8,
+            }
+        };
+        var mapA = L.map('mapA')
+        var southWest = L.latLng(40.00, 0.00),
+        northEast = L.latLng(55.00, 50.00),
+        bounds = L.latLngBounds(southWest, northEast);
+
+        mapA.setView([49.78, 33.72],10);
+        mapA.setMaxBounds(bounds);
+        mapA.setMinZoom(8);
+        mapA.setMaxZoom(18);
+
+        var admin_3 = L.geoJson(admin_3, {
+            style: style_16,
+        }).addTo(mapA);
+
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(mapA); 
+
+
+        var mapB = L.map('mapB', {
+            zoomControl: false,
+        })
+        var southWest = L.latLng(40.00, 0.00),
+        northEast = L.latLng(55.00, 50.00),
+        bounds = L.latLngBounds(southWest, northEast);
+
+        mapB.setView([49.78, 33.72],10);
+        mapB.setMaxBounds(bounds);
+        mapB.setMinZoom(8);
+        mapB.setMaxZoom(18);
+
+        var pashas = L.geoJson(pashas, {
+            style: style_16,
+        }).addTo(mapB);
+
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(mapB);         
+
+
+        var infoB = L.control();
+        infoB.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'infoB');
+            this.update();
+            return this._div;
+        };
+        infoB.update = function (props) {
+            this._div.innerHTML = "<h4>Межі сільрад за даними від Паші</h4>";
+        };
+        infoB.addTo(mapB);        
+
+        var infoA = L.control();
+        infoA.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'infoA');
+            this.update();
+            return this._div;
+        };
+        infoA.update = function (props) {
+            this._div.innerHTML = "<h4>Межі сільрад за даними АТУ з GitHub</h4>";
+        };
+        infoA.addTo(mapA);   
+
+        mapA.sync(mapB)
+        mapB.sync(mapA)
+
+    </script>
+</body>
+</html>
